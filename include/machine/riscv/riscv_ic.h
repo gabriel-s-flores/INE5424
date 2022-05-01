@@ -112,8 +112,10 @@ public:
 
     static void enable() {
         db<IC>(TRC) << "IC::enable()" << endl;
+        
         CPU::mie(CPU::MSI | CPU::MTI | CPU::MEI);
     }
+
 
     static void enable(Interrupt_Id i) {
         db<IC>(TRC) << "IC::enable(int=" << i << ")" << endl;

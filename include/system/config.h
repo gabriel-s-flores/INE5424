@@ -7,15 +7,15 @@
 // ARCHITECTURE, MACHINE, AND APPLICATION SELECTION
 // This section is generated automatically from makedefs by $EPOS/etc/makefile
 //============================================================================
-#define SMOD xxx
-#define ARCH xxx
-#define MACH xxx
-#define MMOD xxx
-#define APPL xxx
-#define __mode_xxx__
-#define __arch_xxx__
-#define __mach_xxx__
-#define __mmod_xxx__
+#define SMOD library
+#define ARCH rv64
+#define MACH riscv
+#define MMOD sifive_u
+#define APPL hello
+#define __mode_library__
+#define __arch_rv64__
+#define __mach_riscv__
+#define __mmod_sifive_u__
 
 //============================================================================
 // NAMESPACES AND DEFINITIONS
@@ -49,9 +49,11 @@ namespace EPOS {
 }
 #endif
 
-#define __HEADER_ARCH(X)        <architecture/ARCH/ARCH/**/_##X.h>
-#define __HEADER_MACH(X)        <machine/MACH/MACH/**/_##X.h>
-#define __HEADER_MMOD(X)        <machine/MACH/MMOD/MMOD/**/_##X.h>
+// Fix strange errors in modern IDEs
+#define __HEADER_FIX(X)         X
+#define __HEADER_ARCH(X)        <architecture/ARCH/__HEADER_FIX(ARCH)_##X.h>
+#define __HEADER_MACH(X)        <machine/MACH/__HEADER_FIX(MACH)_##X.h>
+#define __HEADER_MMOD(X)        <machine/MACH/MMOD/__HEADER_FIX(MMOD)_##X.h>
 #define __HEADER_TRAN(X)        <transducer/X.h>
 #define __APPL_TRAITS_T(X)      <../app/X/X##_traits.h>
 #define __APPL_TRAITS(X)        __APPL_TRAITS_T(X)

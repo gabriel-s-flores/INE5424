@@ -101,7 +101,7 @@ ia32_COMP_PREFIX	:= /usr/bin/x86_64-linux-gnu-
 armv7_COMP_PREFIX	:= /usr/bin/arm-none-eabi-
 armv8_COMP_PREFIX	:= /usr/bin/aarch64-linux-gnu-
 rv32_COMP_PREFIX	:= /usr/local/rv32/bin/riscv32-unknown-linux-gnu-
-rv64_COMP_PREFIX	:= /usr/bin/riscv64-linux-gnu-
+rv64_COMP_PREFIX	:= /usr/bin/riscv-none-elf-
 COMP_PREFIX		= $($(ARCH)_COMP_PREFIX)
 
 # Architecture specifics
@@ -206,16 +206,16 @@ riscv_IMG_SUFFIX	:= .img
 endif
 
 ifeq ($(MMOD),sifive_u)
-riscv_CC_FLAGS		:= -march=rv64gc -mabi=lp64d -Wl, -mno-relax -mcmodel=medany
-riscv_AS_FLAGS		:= -march=rv64gc -mabi=lp64d
-riscv_LD_FLAGS		:= -m elf64lriscv_lp64f --no-relax
-riscv_EMULATOR		= qemu-system-riscv64 $(QEMU_DEBUG) -machine virt -cpu rv64 -smp $(CPUS) -m $(MEM_SIZE)k -serial mon:stdio -bios none -nographic -no-reboot -kernel 
-riscv_DEBUGGER		:= /usr/local/rv32/bin/riscv32-unknown-linux-gnu-gdb
-riscv_FLASHER		:= 
-riscv_MAGIC		:= --nmagic
-riscv_CODE_NAME		:= .init
-riscv_DATA_NAME		:= .data
-riscv_IMG_SUFFIX	:= .img
+riscv_CC_FLAGS          := -mcmodel=medany -march=rv64i -mabi=lp64
+riscv_AS_FLAGS          := 
+riscv_LD_FLAGS          := 
+riscv_EMULATOR          = qemu-system-riscv64 -machine virt -smp $(CPUS) -m $(MEM_SIZE)k -serial mon:stdio -bios none -nographic -no-reboot -kernel 
+riscv_DEBUGGER          := $(COMP_PREFIX)gdb
+riscv_FLASHER           := 
+riscv_MAGIC             := --omagic
+riscv_CODE_NAME := .init
+riscv_DATA_NAME :=
+riscv_IMG_SUFFIX        := .img
 endif
 
 atmega_CC_FLAGS		:= -mmcu=atmega128 -Wno-inline
@@ -248,18 +248,26 @@ MACH_AS_FLAGS		:= -g $(MACH_AS_FLAGS)
 MACH_EMULATOR		= $(subst -m ,-gdb tcp::1235 -S -m ,$($(MACH)_EMULATOR))
 endif
 
+# Architecture specifics
+ARCH_LITTLE		:= little
+ARCH_BIG		:= big
+ARCH_ENDIANESS		= $(ARCH_$(call GETTK,ENDIANESS,$(ARCH_TRAITS)))
+ARCH_WORD_SIZE		= $(call GETTK,WORD_SIZE,$(ARCH_TRAITS))
+ARCH_CLOCK		= $(call GETTK,CLOCK,$(ARCH_TRAITS))
+CC_M_FLAG = "-m$(ARCH_WORD_SIZE)"
+
 # Tools and flags to compile system tools
 TCC		:= gcc -ansi -c -Werror
-TCCFLAGS	= $(CC_M_FLAG) -Wall -O -I$(INCLUDE)
+TCCFLAGS	:= $(CC_M_FLAG) -Wall -O -I$(INCLUDE)
 
 TCXX		:= g++ -c -ansi -fno-exceptions -std=c++14
-TCXXFLAGS	= $(CC_M_FLAG) -Wall -O -I$(INCLUDE)
+TCXXFLAGS	:= $(CC_M_FLAG) -Wall -O -I$(INCLUDE)
 
 TCPP		:= gcc -E
 TCPPFLAGS	:= -I$(INCLUDE)
 
 TLD		:= gcc
-TLDFLAGS	= $(CC_M_FLAG)
+TLDFLAGS	:= $(CC_M_FLAG)
 
 # Tools and flags to compile applications
 ACC		= $(BIN)/eposcc $(MACH_CC_FLAGS)  -c -ansi -O

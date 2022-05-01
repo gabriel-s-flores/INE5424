@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "Risc-V",
+            "includePath": [
+                "${workspaceFolder}/include"
+            ],
+            "defines": ["__riscv", "__riscv_xlen=64", "USE_SIGNALS"],
+            "compilerPath": "/usr/bin/riscv64-linux-gnu-gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++14",
+            "compilerArgs": [
+                "-nostdinc",
+                "-nostdinc++",
+                "-m64"
+            ],
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
+}

@@ -1,0 +1,72 @@
+# GNU Globals
+GPATH
+GRTAGS
+GTAGS
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+# Docker Shared
+docker/shared
+
+# EPOS Exclusive Data
+#    Image Files
+img/
+!img/makefile
+#    App File
+app/*/*
+!app/*/*.h
+!app/*/*.cc
+!app/*/makefile
+#    Tools
+tools/*/*
+!tools/*/makefile
+#    ETC
+etc/*
+!etc/license.txt
+!etc/makefile
+#    Boot Files
+src/boot/*
+!src/boot/boot_legacy_pc.S
+!src/boot/makefile
+#    Setup Files
+src/setup/*
+!src/setup/makefile
+!src/setup/*.cc
+#    Init  Files
+src/init/*
+!src/init/makefile
+!src/init/*.cc
+#    System  Files
+src/system/*
+!src/system/makefile
+!src/system/*.cc

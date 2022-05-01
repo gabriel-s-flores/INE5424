@@ -1,0 +1,142 @@
+{
+    "tasks": [
+        
+        {
+            "label": "RiscV - Make Application",
+            "type": "shell",
+            "command": "docker",
+            "args": [
+                // Execute
+                "run",
+                // Show Logs
+                "-t",
+                // Remove Container After Complete
+                "--rm",
+                // Bind Mount Files
+                "-v", "${workspaceFolder}:${workspaceFolder}:rw",
+                // Change Directory to Build Folder
+                "-w", "${workspaceFolder}/",
+                // Define Build Image
+                "epos_builder_riscv:latest",
+                // Build Command
+                "/bin/ash", "-c", "make SHELL=ash veryclean -j 12 && make SHELL=ash DEBUG=1 APPLICATION=${input:application}"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "RiscV - Begin Execution",
+            "type": "shell",
+            "command": "echo",
+            "args": [
+                // Log Task
+                "Starting QEMU",
+                // Concatenate Program
+                "&",
+                // Execute Docker
+                "docker", "run",
+                // Show Logs
+                "-t",
+                // Remove Container After Complete
+                "--rm",
+                // Bind Mount Files
+                "-v", "${workspaceFolder}:${workspaceFolder}:rw",
+                // Change Directory to Images Folder
+                "-w", "${workspaceFolder}/img",
+                // Bind Ports for GDB
+                "-p", "1235:1235/tcp",
+                // Define Execution Image
+                "epos_builder_riscv:latest",
+                // Build Command
+                "/bin/ash", "-c", "make SHELL=ash APPLICATION=${input:application} run1"
+            ],
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(Starting QEMU)",
+                    "line": 1
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^(Starting QEMU)",
+                    "endsPattern": "^(Starting QEMU)"
+                }
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "RiscV - Begin Emulation",
+            "type": "shell",
+            "command": "echo",
+            "args": [
+                // Log Task
+                "Starting QEMU",
+                // Concatenate Program
+                "&",
+                // Execute Docker
+                "docker", "run",
+                // Show Logs
+                "-t",
+                // Remove Container After Complete
+                "--rm",
+                // Bind Mount Files
+                "-v", "${workspaceFolder}:${workspaceFolder}:rw",
+                // Change Directory to Images Folder
+                "-w", "${workspaceFolder}/img",
+                // Bind Ports for GDB
+                "-p", "1235:1235/tcp",
+                // Define Execution Image
+                "epos_builder_riscv:latest",
+                // Build Command
+                // "/bin/ash", "-c", "qemu-system-aarch64 -M raspi3 -cpu cortex-a53 -smp 4 -gdb tcp::1235 -S -m 1G -serial null -serial mon:stdio -nographic -no-reboot -device loader,file=${input:application}.img,addr=0x01000000,force-raw=on -kernel ${input:application}.bin"
+                "/bin/ash", "-c", "qemu-system-aarch64 -M virt -smp 4 -gdb tcp::1235 -S -m 128M -serial null -serial mon:stdio -nographic -no-reboot -kernel ${input:application}.bin -monitor unix:qemu-monitor-socket,server,nowait"
+            ],
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(Starting QEMU)",
+                    "line": 1
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^(Starting QEMU)",
+                    "endsPattern": "^(Starting QEMU)"
+                }
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "RiscV - Make and Run",
+            "dependsOrder": "sequence",
+            "dependsOn": ["RiscV - Make Application", "RiscV - Begin Execution"]
+        },
+        {
+            "label": "RiscV - Make and Emulate",
+            "dependsOrder": "sequence",
+            "dependsOn": ["RiscV - Make Application", "RiscV - Begin Emulation"]
+        }
+    ],
+    "version": "2.0.0",
+    "inputs": [
+        {
+            "id": "application",
+            "description": "[Task] Select the current project",
+            "type": "pickString",
+            "default": "hello",
+            "options": [
+                {"label": "Hello", "value": "hello"},
+                {"label": "Hello Threads", "value": "hello_threads"},
+                {"label": "Philosophers Dinner", "value": "philosophers_dinner"},
+                {"label": "Philosophers Consumer", "value": "producer_consumer"}
+
+            ]
+        }
+    ]
+}
